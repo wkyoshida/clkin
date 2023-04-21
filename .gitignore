@@ -16,3 +16,6 @@
 
 # Built go binaries
 bin/
+
+# Time log file for clkin
+.clkin.log
