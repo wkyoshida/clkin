@@ -39,7 +39,7 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 		Version: "0.0.0",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Run: func(cmd *cobra.Command, args []string) {
 			now := time.Now()
 
 			var nowString string
@@ -52,30 +52,19 @@ to quickly create a Cobra application.`,
 			fmt.Println("Current time is: ", nowString)
 
 			f, err := os.OpenFile(timeLog, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-			if err != nil {
-				return err
-			}
+			cobra.CheckErr(err)
 
 			defer f.Close()
 
 			_, err = f.WriteString(nowString + "\n")
-			if err != nil {
-				return err
-			}
-
-			return nil
+			cobra.CheckErr(err)
 		},
 	}
 )
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
+// Execute executes the root command.
+func Execute() error {
+	return rootCmd.Execute()
 }
 
 func init() {
