@@ -31,13 +31,11 @@ var (
 
 	rootCmd = &cobra.Command{
 		Use:   "clkin",
-		Short: "A brief description of your application",
-		Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+		Short: "Simple time tracking with a time log file",
+		Long: `Simple time tracking with a time log file.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+CLKIN records timestamps into a file and allows operations, 
+such as finding the elapsed time between records.`,
 		Version: "0.0.0",
 		Run: func(cmd *cobra.Command, args []string) {
 			now := time.Now()
