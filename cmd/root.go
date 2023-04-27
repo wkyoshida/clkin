@@ -29,6 +29,7 @@ var (
 	humanRead bool
 	timeLog   string
 
+	// rootCmd represents the base command when called without any subcommands
 	rootCmd = &cobra.Command{
 		Use:   "clkin",
 		Short: "Simple time tracking with a time log file",
@@ -67,5 +68,5 @@ func Execute() error {
 
 func init() {
 	rootCmd.PersistentFlags().BoolVar(&humanRead, "human", false, "use human-readable time format")
-	rootCmd.PersistentFlags().StringVarP(&timeLog, "timelog", "t", ".clkin.log", "file path to time log")
+	rootCmd.PersistentFlags().StringVarP(&timeLog, "timelog", "l", ".clkin.log", "file path to time log")
 }
