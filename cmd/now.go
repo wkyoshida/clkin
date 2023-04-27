@@ -17,35 +17,57 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package cmd
 
 import (
+	"fmt"
+	"os"
+	"time"
+
 	"github.com/spf13/cobra"
 )
 
 var (
 	// Used for flags.
-	humanRead bool
-	timeLog   string
+	noEntry bool
 
-	// rootCmd represents the base command when called without any subcommands
-	rootCmd = &cobra.Command{
-		Use:   "clkin",
-		Short: "Simple time tracking with a time log file",
-		Long: `Simple time tracking with a time log file.
+	// nowCmd represents the now command
+	nowCmd = &cobra.Command{
+		Use:   "now",
+		Short: "Record the current time",
+		Long: `Record the current time.
 
-CLKIN records timestamps into a file and allows operations, 
-such as finding the elapsed time between records.`,
-		Version: "0.0.0",
+This is the same behavior for clkin when invoked by default.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			recordNow()
 		},
 	}
 )
 
-// Execute executes the root command.
-func Execute() error {
-	return rootCmd.Execute()
+func init() {
+	rootCmd.AddCommand(nowCmd)
+
+	nowCmd.PersistentFlags().BoolVar(&noEntry, "no-entry", false, "do not enter time in time log")
 }
 
-func init() {
-	rootCmd.PersistentFlags().BoolVar(&humanRead, "human", false, "use human-readable time format")
-	rootCmd.PersistentFlags().StringVarP(&timeLog, "timelog", "l", ".clkin.log", "file path to time log")
+func recordNow() {
+	now := time.Now()
+
+	var nowString string
+	if humanRead {
+		nowString = now.Format(time.RFC1123)
+	} else {
+		nowString = now.String()
+	}
+
+	fmt.Println("Current time is: ", nowString)
+
+	if noEntry {
+		return
+	}
+
+	f, err := os.OpenFile(timeLog, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	cobra.CheckErr(err)
+
+	defer f.Close()
+
+	_, err = f.WriteString(nowString + "\n")
+	cobra.CheckErr(err)
 }
