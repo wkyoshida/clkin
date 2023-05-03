@@ -49,13 +49,7 @@ func init() {
 
 func recordNow() {
 	now := time.Now()
-
-	var nowString string
-	if humanRead {
-		nowString = now.Format(time.RFC1123)
-	} else {
-		nowString = now.String()
-	}
+	nowString := getTimeString(now)
 
 	fmt.Println("Current time is: ", nowString)
 
