@@ -20,17 +20,33 @@ import (
 	"bufio"
 	"os"
 	"time"
+
+	"github.com/spf13/cobra"
 )
 
 func getTimeString(timestamp time.Time) string {
 	if humanRead {
 		return timestamp.Format(time.RFC1123)
 	} else {
-		return timestamp.String()
+		return timestamp.Format(time.RFC3339Nano)
 	}
 }
 
-func readLogLine(f *os.File, lineNumber int) (line string, err error) {
+func getLogEntryTime(f *os.File, lineNumber int) time.Time {
+	entry, err := readLogEntry(f, lineNumber)
+	cobra.CheckErr(err)
+
+	// attempt parsing both default and human-readable formats
+	entryTime, err := time.Parse(time.RFC3339Nano, entry)
+	if err != nil {
+		entryTime, err = time.Parse(time.RFC1123, entry)
+	}
+	cobra.CheckErr(err)
+
+	return entryTime
+}
+
+func readLogEntry(f *os.File, lineNumber int) (line string, err error) {
 	scanner := bufio.NewScanner(f)
 	var linesSeen int
 
@@ -38,7 +54,7 @@ func readLogLine(f *os.File, lineNumber int) (line string, err error) {
 		linesSeen++
 
 		if linesSeen == lineNumber {
-			return scanner.Text(), scanner.Err()
+			return scanner.Text(), nil
 		}
 	}
 
