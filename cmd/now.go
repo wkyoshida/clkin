@@ -18,7 +18,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -55,11 +54,6 @@ func recordNow() {
 		return
 	}
 
-	f, err := os.OpenFile(timeLog, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	cobra.CheckErr(err)
-
-	defer f.Close()
-
-	_, err = f.WriteString(nowString + "\n")
+	err := timeLog.addEntry(nowString)
 	cobra.CheckErr(err)
 }

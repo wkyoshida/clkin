@@ -23,7 +23,7 @@ import (
 var (
 	// Used for flags.
 	humanRead bool
-	timeLog   string
+	timeLog   timeLogFile
 
 	// rootCmd represents the base command when called without any subcommands
 	rootCmd = &cobra.Command{
@@ -46,10 +46,24 @@ func Execute() error {
 }
 
 func init() {
+	cobra.OnInitialize(openTimeLog)
+
 	rootCmd.PersistentFlags().BoolVar(&humanRead, "human", false, "use human-readable time format")
-	rootCmd.PersistentFlags().StringVarP(&timeLog, "timelog", "l", ".clkin.log", "file path to time log")
+	rootCmd.PersistentFlags().StringVarP(&timeLog.name, "timelog", "l", ".clkin.log", "file path to time log")
 
 	rootCmd.AddCommand(diffCmd)
 	rootCmd.AddCommand(nowCmd)
 	rootCmd.AddCommand(versionCmd)
+
+	cobra.OnFinalize(closeTimeLog)
+}
+
+func openTimeLog() {
+	err := timeLog.open()
+	cobra.CheckErr(err)
+}
+
+func closeTimeLog() {
+	err := timeLog.close()
+	cobra.CheckErr(err)
 }
