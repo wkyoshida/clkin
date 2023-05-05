@@ -48,4 +48,8 @@ func Execute() error {
 func init() {
 	rootCmd.PersistentFlags().BoolVar(&humanRead, "human", false, "use human-readable time format")
 	rootCmd.PersistentFlags().StringVarP(&timeLog, "timelog", "l", ".clkin.log", "file path to time log")
+
+	rootCmd.AddCommand(diffCmd)
+	rootCmd.AddCommand(nowCmd)
+	rootCmd.AddCommand(versionCmd)
 }

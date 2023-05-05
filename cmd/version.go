@@ -30,7 +30,3 @@ var versionCmd = &cobra.Command{
 		fmt.Println(rootCmd.Use, "version", rootCmd.Version)
 	},
 }
-
-func init() {
-	rootCmd.AddCommand(versionCmd)
-}

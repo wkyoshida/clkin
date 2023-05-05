@@ -42,8 +42,6 @@ This is the same behavior for clkin when invoked by default.`,
 )
 
 func init() {
-	rootCmd.AddCommand(nowCmd)
-
 	nowCmd.PersistentFlags().BoolVar(&noEntry, "no-entry", false, "do not enter time in time log")
 }
 

@@ -45,8 +45,6 @@ to quickly create a Cobra application.`,
 )
 
 func init() {
-	rootCmd.AddCommand(diffCmd)
-
 	diffCmd.PersistentFlags().IntVarP(&from, "from", "f", 0, "file line number of starting time (default to last line)")
 	diffCmd.PersistentFlags().IntVarP(&to, "to", "t", 0, "file line number of ending time (default to current time)")
 	diffCmd.PersistentFlags().BoolVar(&enterDiff, "enter", false, "enter elapsed time in time log")
