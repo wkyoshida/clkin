@@ -46,7 +46,7 @@ func init() {
 
 func recordNow() {
 	now := time.Now()
-	nowString := getTimeString(now)
+	nowString := timeToString(now)
 
 	fmt.Println("Current time is: ", nowString)
 
