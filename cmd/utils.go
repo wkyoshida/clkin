@@ -18,6 +18,8 @@ package cmd
 
 import (
 	"bufio"
+	"fmt"
+	"io"
 	"os"
 	"time"
 )
@@ -36,7 +38,7 @@ func stringToTime(s string) (t time.Time, err error) {
 	if err != nil {
 		t, err = time.Parse(time.RFC1123, s)
 		if err != nil {
-			return t, err
+			return time.Time{}, err
 		}
 	}
 
@@ -44,13 +46,27 @@ func stringToTime(s string) (t time.Time, err error) {
 }
 
 type timeLogFile struct {
-	name string
-	file *os.File
+	name      string
+	file      *os.File
+	size      int64
+	offset    int64
+	linesSeen int
 }
 
 func (f *timeLogFile) open() (err error) {
 	f.file, err = os.OpenFile(f.name, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
-	return err
+	if err != nil {
+		return err
+	}
+
+	fileStat, err := f.file.Stat()
+	if err != nil {
+		return err
+	}
+
+	f.size = fileStat.Size()
+
+	return nil
 }
 
 func (f *timeLogFile) close() (err error) {
@@ -58,22 +74,47 @@ func (f *timeLogFile) close() (err error) {
 }
 
 func (f *timeLogFile) addEntry(timeString string) (err error) {
-	_, err = f.file.WriteString(timeString + "\n")
-	return err
+	bytes, err := f.file.WriteString(timeString + "\n")
+	if err != nil {
+		return err
+	}
+
+	f.size += int64(bytes)
+
+	return nil
 }
 
+func (f *timeLogFile) readEntry(lineNumber int) (entry string, err error) {
+	_, err = f.file.Seek(f.offset, io.SeekStart)
+	if err != nil {
+		return "", err
+	}
 
-func (f *timeLogFile) readEntry(lineNumber int) (line string, err error) {
-	scanner := bufio.NewScanner(f.file)
-	var linesSeen int
+	reader := bufio.NewReader(f.file)
 
-	for scanner.Scan() {
-		linesSeen++
+	for f.offset < f.size {
+		lineBytes, err := reader.ReadBytes('\n')
+		if err != nil {
+			return "", err
+		}
 
-		if linesSeen == lineNumber {
-			return scanner.Text(), nil
+		lineLen := len(lineBytes)
+		f.offset += int64(lineLen)
+		f.linesSeen++
+
+		if lineBytes[lineLen-1] == '\n' {
+			drop := 1
+			if lineLen > 1 && lineBytes[lineLen-2] == '\r' {
+				drop = 2
+			}
+
+			lineBytes = lineBytes[:lineLen-drop]
+		}
+
+		if f.linesSeen == lineNumber {
+			return string(lineBytes), nil
 		}
 	}
 
-	return line, scanner.Err()
+	return "", fmt.Errorf("entry %d not found", lineNumber)
 }
