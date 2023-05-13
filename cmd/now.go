@@ -34,6 +34,7 @@ var (
 		Long: `Record the current time.
 
 This is the same behavior for clkin when invoked by default.`,
+		Args: cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			recordNow()
 		},

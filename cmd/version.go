@@ -26,6 +26,7 @@ import (
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print version information",
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(rootCmd.Use, "version", rootCmd.Version)
 	},
