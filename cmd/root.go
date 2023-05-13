@@ -34,8 +34,17 @@ var (
 CLKIN records timestamps into a file and allows operations, 
 such as finding the elapsed time between records.`,
 		Version: "0.0.0",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			err := timeLog.open()
+			cobra.CheckErr(err)
+		},
 		Run: func(cmd *cobra.Command, args []string) {
-			recordNow()
+			err := recordNow(cmd, args)
+			cobra.CheckErr(err)
+		},
+		PersistentPostRun: func(cmd *cobra.Command, args []string) {
+			err := timeLog.close()
+			cobra.CheckErr(err)
 		},
 	}
 )
@@ -46,24 +55,10 @@ func Execute() error {
 }
 
 func init() {
-	cobra.OnInitialize(openTimeLog)
-
 	rootCmd.PersistentFlags().BoolVar(&humanRead, "human", false, "use human-readable time format")
 	rootCmd.PersistentFlags().StringVarP(&timeLog.name, "timelog", "l", ".clkin.log", "file path to time log")
 
 	rootCmd.AddCommand(diffCmd)
 	rootCmd.AddCommand(nowCmd)
 	rootCmd.AddCommand(versionCmd)
-
-	cobra.OnFinalize(closeTimeLog)
-}
-
-func openTimeLog() {
-	err := timeLog.open()
-	cobra.CheckErr(err)
-}
-
-func closeTimeLog() {
-	err := timeLog.close()
-	cobra.CheckErr(err)
 }

@@ -36,7 +36,8 @@ var (
 This is the same behavior for clkin when invoked by default.`,
 		Args: cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			recordNow()
+			err := recordNow(cmd, args)
+			cobra.CheckErr(err)
 		},
 	}
 )
@@ -45,16 +46,15 @@ func init() {
 	nowCmd.PersistentFlags().BoolVar(&noEntry, "no-entry", false, "do not enter time in time log")
 }
 
-func recordNow() {
+func recordNow(cmd *cobra.Command, args []string) (err error) {
 	now := time.Now()
 	nowString := timeToString(now)
 
 	fmt.Println("Current time is: ", nowString)
 
 	if noEntry {
-		return
+		return nil
 	}
 
-	err := timeLog.addEntry(nowString)
-	cobra.CheckErr(err)
+	return timeLog.addEntry(nowString)
 }
