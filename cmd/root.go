@@ -17,6 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package cmd
 
 import (
+	"time"
+
 	"github.com/spf13/cobra"
 )
 
@@ -24,6 +26,9 @@ var (
 	// Used for flags.
 	humanRead bool
 	timeLog   timeLogFile
+
+	// now holds the current time
+	now time.Time
 
 	// rootCmd represents the base command when called without any subcommands
 	rootCmd = &cobra.Command{
@@ -35,6 +40,8 @@ CLKIN records timestamps into a file and allows operations,
 such as finding the elapsed time between records.`,
 		Version: "0.0.0",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			now = time.Now()
+
 			err := timeLog.open()
 			cobra.CheckErr(err)
 		},

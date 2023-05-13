@@ -18,7 +18,6 @@ package cmd
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -47,7 +46,6 @@ func init() {
 }
 
 func recordNow(cmd *cobra.Command, args []string) (err error) {
-	now := time.Now()
 	nowString := timeToString(now)
 
 	fmt.Println("Current time is: ", nowString)
